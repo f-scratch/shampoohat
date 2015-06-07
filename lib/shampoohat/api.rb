@@ -208,6 +208,7 @@ module Shampoohat
               @config,
               api_config.environment_config(environment, :oauth_scope)
           )
+        when :NOTHING
         else
           raise Shampoohat::Errors::Error,
               "Unknown authentication method '%s'" % auth_method
@@ -228,6 +229,7 @@ module Shampoohat
       environment = config.read('service.environment')
       api_config.do_require(version, service)
       endpoint = api_config.endpoint(environment, version, service)
+      endpoint = "https://sandbox.ss.yahooapis.jp/services/V5.1/LocationService"
       interface_class_name = api_config.interface_name(version, service)
 
       wrapper = class_for_path(interface_class_name).new(@config, endpoint)

@@ -18,7 +18,7 @@
 #           limitations under the License.
 #
 # This class validates input parameters before passing them to Savon.
-
+require 'pry'
 require 'shampoohat/utils'
 
 module Shampoohat
@@ -50,7 +50,8 @@ module Shampoohat
           |result, (in_param, index)|
         result.merge({in_param[:name] => deep_copy(args[index])})
       end
-      validate_arguments(args_hash, in_params)
+      validate_arguments(args_hash, in_params, 1)
+      # validate_arguments(args_hash, in_params)
       return args_hash
     end
 

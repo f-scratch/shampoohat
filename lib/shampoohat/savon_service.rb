@@ -18,7 +18,7 @@
 #           limitations under the License.
 #
 # Base class for all generated API services based on Savon backend.
-
+require 'pry'
 require 'savon'
 
 require 'shampoohat/http'
@@ -67,6 +67,9 @@ module Shampoohat
         wsdl.namespace = namespace
         Shampoohat::Http.configure_httpi(@config, httpi)
       end
+      client.config.env_namespace = :soapenv
+      client.config.pretty_print_xml = true
+      client.config.log = true
       client.config.raise_errors = false
       client.config.logger.subject = get_logger()
       return client
@@ -79,6 +82,7 @@ module Shampoohat
       args = validator.validate_args(action_name, args)
       response = execute_soap_request(
           action_name.to_sym, args, validator.extra_namespaces)
+      puts response.to_xml
       log_headers(response.http.headers)
       handle_errors(response)
       extractor = ResultsExtractor.new(registry)
@@ -99,9 +103,11 @@ module Shampoohat
           get_service_registry.get_method_signature(action)[:original_name]
       original_action_name = action if original_action_name.nil?
       response = @client.request(original_action_name) do |soap, wsdl, http|
+        soap.header = { "ns1:RequestHeader" => {"ns1:license" => "xxxx", "ns1:apiAccountId" => "yyyy", "ns1:apiAccountPassword" => "zzzz"}}
         soap.body = args
         header_handler.prepare_request(http, soap)
         soap.namespaces.merge!(extra_namespaces) unless extra_namespaces.nil?
+        puts soap.to_xml
       end
       return response
     end
