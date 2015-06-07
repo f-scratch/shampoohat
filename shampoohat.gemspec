@@ -5,7 +5,7 @@ require 'shampoohat/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "shampoohat"
-  spec.version       = Shampoohat::ApiConfig::VERSION
+  spec.version       = Shampoohat::ApiConfig::CLIENT_LIB_VERSION
   spec.authors       = ["Junya Wako"]
   spec.email         = ["junwako@gmail.com"]
 
@@ -26,9 +26,9 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  s.add_dependency('savon', '~> 1.2.0')
-  s.add_dependency('httpi', '~> 1.1.0')
-  s.add_dependency('signet', '~> 0.6.0')
+  spec.add_dependency('savon', '~> 1.2.0')
+  spec.add_dependency('httpi', '~> 1.1.0')
+  spec.add_dependency('signet', '~> 0.6.0')
 
   spec.add_development_dependency "bundler", "~> 1.10"
   spec.add_development_dependency "rake", "~> 10.0"
