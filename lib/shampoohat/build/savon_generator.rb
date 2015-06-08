@@ -19,7 +19,7 @@
 #
 # Generates the wrappers for API services. Only used during the
 # 'rake generate' step of library setup.
-
+require 'pry'
 require 'savon'
 
 require 'shampoohat/build/savon_service_generator'

@@ -19,7 +19,7 @@
 #
 # Registry object for Savon backend. Used on generation step as parsed
 # representation of WSDL for API stubs generation.
-
+require 'pry'
 require 'savon'
 require 'rexml/document'
 
@@ -63,12 +63,15 @@ module Shampoohat
 
       # Extracts different types from XML.
       def process_types(doc)
-        REXML::XPath.each(doc, '//schema') do |schema|
+        REXML::XPath.each(doc, '//s:schema') do |schema|
           ns_index = process_namespace(schema)
+          puts ns_index
           complex_types = get_complex_types(schema)
           simple_types =  get_simple_types(schema)
           (complex_types + simple_types).each do |ctype|
             ctype_name = get_element_name(ctype)
+            puts ctype
+            puts extract_type(ctype, ns_index)
             @soap_types << extract_type(ctype, ns_index)
             if ctype_name.match('.+Exception$')
               @soap_exceptions << extract_exception(ctype)
@@ -102,12 +105,12 @@ module Shampoohat
 
       # Extracts ComplexTypes from node into an array.
       def get_complex_types(node)
-        return REXML::XPath.each(node, 'complexType').to_a
+        return REXML::XPath.each(node, 's:complexType').to_a
       end
 
       # Extracts SimpleTypes from node into an array.
       def get_simple_types(node)
-        return REXML::XPath.each(node, 'simpleType').to_a
+        return REXML::XPath.each(node, 's:simpleType').to_a
       end
 
       # Extracts exception parameters from ComplexTypes element.
@@ -172,8 +175,8 @@ module Shampoohat
       def find_sequence_fields(name, doc)
         result = []
         doc.each_element_with_attribute('name', name, 0,
-            '//schema/element') do |element_node|
-          REXML::XPath.each(element_node, 'complexType/sequence') do |seq_node|
+            '//s:schema/s:element') do |element_node|
+          REXML::XPath.each(element_node, 's:complexType/s:sequence') do |seq_node|
             result += get_element_fields(seq_node)
           end
         end
