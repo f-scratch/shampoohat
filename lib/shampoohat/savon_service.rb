@@ -18,7 +18,6 @@
 #           limitations under the License.
 #
 # Base class for all generated API services based on Savon backend.
-require 'pry'
 require 'savon'
 
 require 'shampoohat/http'

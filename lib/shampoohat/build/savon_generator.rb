@@ -19,7 +19,6 @@
 #
 # Generates the wrappers for API services. Only used during the
 # 'rake generate' step of library setup.
-require 'pry'
 require 'savon'
 
 require 'shampoohat/build/savon_service_generator'
@@ -42,14 +41,15 @@ module Shampoohat
       # - version a version of the service
       # - service_name a service name to generate stubs for
       #
-      def initialize(wsdl_url, code_path, api_name, version, service_name)
+      def initialize(wsdl_url, code_path, api_name, version, service_name, ns_prefix=nil)
         @wsdl_url = wsdl_url
         @code_path = code_path
         @generator_args = {
             :api_name => api_name,
             :version => version,
             :service_name => service_name,
-            :require_path => @code_path.sub(/^lib\//, '')
+            :require_path => @code_path.sub(/^lib\//, ''),
+            :ns_prefix => ns_prefix
         }
         @logger = Logger.new(STDOUT)
         @logger.level = Logger::INFO

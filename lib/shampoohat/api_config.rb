@@ -209,7 +209,7 @@ module Shampoohat
     # Returns
     #   hash of pairs Service => WSDL URL
     #
-    def get_wsdls(version)
+    def get_wsdls(version, extension=nil)
       res = {}
       wsdl_base = get_wsdl_base(default_environment(), version)
       services(version).each do |service|
@@ -218,7 +218,9 @@ module Shampoohat
           subdir_name = subdir(version, service);
           path = path + subdir_name if subdir_name and !subdir_name.empty?
         end
-        path = path + version.to_s + '/' + service.to_s + '?wsdl'
+        version = version.to_s.gsub("_", ".") if version.to_s.include?("_")
+        path = path + version.to_s + '/' + service.to_s
+        path = extension.nil? ? path + '?wsdl' : path + ".#{extension}?wsdl"
         res[service.to_s] = path
       end
       return res

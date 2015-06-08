@@ -18,7 +18,6 @@
 #           limitations under the License.
 #
 # This class validates input parameters before passing them to Savon.
-require 'pry'
 require 'shampoohat/utils'
 
 module Shampoohat
