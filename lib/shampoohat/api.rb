@@ -229,8 +229,6 @@ module Shampoohat
       environment = config.read('service.environment')
       api_config.do_require(version, service)
       endpoint = api_config.endpoint(environment, version, service)
-      # TODO
-      endpoint = "https://sandbox.ss.yahooapis.jp/services/V5.1/LocationService"
       interface_class_name = api_config.interface_name(version, service)
 
       wrapper = class_for_path(interface_class_name).new(@config, endpoint)
