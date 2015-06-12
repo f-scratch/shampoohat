@@ -34,6 +34,7 @@ module Shampoohat
         @version = args[:version]
         @service_name = args[:service_name]
         @namespace = args[:namespace]
+        @default_ns = args[:default_ns]
         prepare_template_strings()
       end
 

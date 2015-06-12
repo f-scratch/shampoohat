@@ -18,6 +18,7 @@
 #           limitations under the License.
 #
 # Base class for all generated API services based on Savon backend.
+require 'pry'
 require 'savon'
 
 require 'shampoohat/http'
@@ -31,13 +32,15 @@ module Shampoohat
     attr_reader :config
     attr_reader :version
     attr_reader :namespace
+    attr_reader :default_ns
 
     # Creates a new service.
-    def initialize(config, endpoint, namespace, version)
+    def initialize(config, endpoint, namespace, version, ns=nil)
       if self.class() == Shampoohat::SavonService
         raise NoMethodError, 'Tried to instantiate an abstract class'
       end
       @config, @version, @namespace = config, version, namespace
+      @default_ns = ns
       @client = create_savon_client(endpoint, namespace)
     end
 
@@ -66,6 +69,7 @@ module Shampoohat
         wsdl.namespace = namespace
         Shampoohat::Http.configure_httpi(@config, httpi)
       end
+      # TODO
       client.config.env_namespace = :soapenv
       client.config.pretty_print_xml = true
       client.config.log = true
@@ -77,7 +81,7 @@ module Shampoohat
     # Executes SOAP action specified as a string with given arguments.
     def execute_action(action_name, args, &block)
       registry = get_service_registry()
-      validator = ParametersValidator.new(registry)
+      validator = ParametersValidator.new(registry, default_ns)
       args = validator.validate_args(action_name, args)
       response = execute_soap_request(
           action_name.to_sym, args, validator.extra_namespaces)
@@ -101,7 +105,7 @@ module Shampoohat
       original_action_name =
           get_service_registry.get_method_signature(action)[:original_name]
       original_action_name = action if original_action_name.nil?
-      response = @client.request(original_action_name) do |soap, wsdl, http|
+      response = @client.request(default_ns, original_action_name) do |soap, wsdl, http|
         soap.body = args
         header_handler.prepare_request(http, soap)
         soap.namespaces.merge!(extra_namespaces) unless extra_namespaces.nil?

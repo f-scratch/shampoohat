@@ -4,12 +4,12 @@ require 'shampoohat/savon_headers/base_header_handler'
 
 module Shampoohat
   module SavonHeaders
-    class YahooHeaderHandler < BaseHeaderHandler
+    class CriteoHeaderHandler < BaseHeaderHandler
 
       private
 
       def generate_headers(request, soap)
-        soap.header = { "ns1:RequestHeader" => @header_info }
+        soap.header = { "v20:apiHeader" => @header_info }
       end
     end
   end

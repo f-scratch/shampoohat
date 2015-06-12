@@ -41,7 +41,7 @@ module Shampoohat
       # - version a version of the service
       # - service_name a service name to generate stubs for
       #
-      def initialize(wsdl_url, code_path, api_name, version, service_name, ns_prefix=nil, wsdl_provider=nil)
+      def initialize(wsdl_url, code_path, api_name, version, service_name, ns_prefix=nil, wsdl_provider=nil, default_ns=nil)
         @wsdl_url = wsdl_url
         @code_path = code_path
         @generator_args = {
@@ -50,7 +50,8 @@ module Shampoohat
             :service_name => service_name,
             :require_path => @code_path.sub(/^lib\//, ''),
             :ns_prefix => ns_prefix,
-            :wsdl_provider => wsdl_provider
+            :wsdl_provider => wsdl_provider,
+            :default_ns => default_ns
         }
         @logger = Logger.new(STDOUT)
         @logger.level = Logger::INFO

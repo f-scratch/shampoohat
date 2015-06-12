@@ -44,7 +44,8 @@ module Shampoohat
         class <%= @service_name %> < Shampoohat::SavonService
           def initialize(config, endpoint)
             namespace = '<%= @namespace %>'
-            super(config, endpoint, namespace, :<%= @version %>)
+            default_ns = '<%= @default_ns %>'
+            super(config, endpoint, namespace, :<%= @version %>, default_ns)
           end
           <% @actions.each do |action| %>
 

@@ -39,13 +39,13 @@ module Shampoohat
       #  - version: services version
       #
       def initialize(credential_handler, auth_handler, header_ns, namespace,
-                     version, login_info=nil)
+                     version, header_info=nil)
         @credential_handler = credential_handler
         @auth_handler = auth_handler
         @header_ns = header_ns
         @namespace = namespace
         @version = version
-        @login_info = login_info
+        @header_info = header_info
       end
 
       # Enriches soap object with API-specific headers like namespaces, login

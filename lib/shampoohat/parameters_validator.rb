@@ -33,9 +33,10 @@ module Shampoohat
     # Args:
     #  - registry: a registry that defines service
     #
-    def initialize(registry)
+    def initialize(registry, default_namespace=nil)
       @registry = registry
       @extra_namespaces = {}
+      @default_namespace = default_namespace
     end
 
     # Validates input parameters to:
@@ -49,8 +50,7 @@ module Shampoohat
           |result, (in_param, index)|
         result.merge({in_param[:name] => deep_copy(args[index])})
       end
-      validate_arguments(args_hash, in_params, 1)
-      # validate_arguments(args_hash, in_params)
+      validate_arguments(args_hash, in_params)
       return args_hash
     end
 
@@ -72,6 +72,7 @@ module Shampoohat
 
           item_type = get_full_type_signature(field[:type])
           item_ns = field[:ns] || type_ns
+          key = handle_namespace_override_for_fixed(args_hash, key) if @default_namespace
           key = handle_namespace_override(args_hash, key, item_ns) if item_ns
 
           # Separate validation for choice types as we need to inject nodes into
@@ -163,6 +164,13 @@ module Shampoohat
     def handle_namespace_override(args, key, ns)
       add_extra_namespace(ns)
       new_key = prefix_key_with_namespace(key.to_s.lower_camelcase, ns)
+      rename_hash_key(args, key, new_key)
+      replace_array_item(args[:order!], key, new_key)
+      return new_key
+    end
+
+    def handle_namespace_override_for_fixed(args, key)
+      new_key = prefix_key(key.to_s.lower_camelcase, @default_namespace)
       rename_hash_key(args, key, new_key)
       replace_array_item(args[:order!], key, new_key)
       return new_key
