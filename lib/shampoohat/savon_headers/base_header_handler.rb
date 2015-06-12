@@ -18,7 +18,7 @@
 #           limitations under the License.
 #
 # Base class for handlers of SOAP headers.
-
+require 'pry'
 require 'savon'
 
 module Shampoohat
@@ -39,12 +39,13 @@ module Shampoohat
       #  - version: services version
       #
       def initialize(credential_handler, auth_handler, header_ns, namespace,
-                     version)
+                     version, login_info=nil)
         @credential_handler = credential_handler
         @auth_handler = auth_handler
         @header_ns = header_ns
         @namespace = namespace
         @version = version
+        @login_info = login_info
       end
 
       # Enriches soap object with API-specific headers like namespaces, login

@@ -102,7 +102,6 @@ module Shampoohat
           get_service_registry.get_method_signature(action)[:original_name]
       original_action_name = action if original_action_name.nil?
       response = @client.request(original_action_name) do |soap, wsdl, http|
-        soap.header = { "ns1:RequestHeader" => {"ns1:license" => "6561-3912-0079-1792", "ns1:apiAccountId" => "7482-0135-5219-1450", "ns1:apiAccountPassword" => "osay0364"}}
         soap.body = args
         header_handler.prepare_request(http, soap)
         soap.namespaces.merge!(extra_namespaces) unless extra_namespaces.nil?

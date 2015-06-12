@@ -19,6 +19,7 @@
 #
 # Registry object for Savon backend. Used on generation step as parsed
 # representation of WSDL for API stubs generation.
+require 'pry'
 require 'savon'
 require 'rexml/document'
 
@@ -43,6 +44,7 @@ module Shampoohat
         @options = options
         @default_namespace = options[:namespace]
         @ns_prefix = options[:ns_prefix].nil? ? "" : "#{options[:ns_prefix]}:"
+        @wsdl_provider = options[:wsdl_provider].nil? ? "" : options[:wsdl_provider]
         do_process_wsdl(wsdl)
       end
 
@@ -65,13 +67,10 @@ module Shampoohat
       def process_types(doc)
         REXML::XPath.each(doc, "//#{@ns_prefix}schema") do |schema|
           ns_index = process_namespace(schema)
-          puts ns_index
           complex_types = get_complex_types(schema)
           simple_types =  get_simple_types(schema)
           (complex_types + simple_types).each do |ctype|
             ctype_name = get_element_name(ctype)
-            puts ctype
-            puts extract_type(ctype, ns_index)
             @soap_types << extract_type(ctype, ns_index)
             if ctype_name.match('.+Exception$')
               @soap_exceptions << extract_exception(ctype)
@@ -147,7 +146,7 @@ module Shampoohat
         type[:base] = base_type if base_type
         type[:ns] = ns_index if ns_index
         REXML::XPath.each(type_element,
-            'sequence | complexContent/extension/sequence') do |seq_node|
+            "#{@ns_prefix}sequence | #{@ns_prefix}complexContent/#{@ns_prefix}extension/#{@ns_prefix}sequence") do |seq_node|
           type[:fields] += get_element_fields(seq_node)
         end
         REXML::XPath.each(type_element, 'choice') do |seq_node|
@@ -166,7 +165,12 @@ module Shampoohat
       # Extracts output parameter name and fields.
       def extract_output_parameters(op_node, doc)
         output_element = REXML::XPath.first(op_node, 'descendant::wsdl:output')
-        output_name = get_element_name(output_element)
+        if @wsdl_provider == :criteo
+          # NOTE : criteo's wsdl doesn't have 'name' in wsdl:output
+          output_name = get_element_name(op_node) + "Response"
+        else
+          output_name = get_element_name(output_element)
+        end
         output_fields = find_sequence_fields(output_name, doc)
         return {:name => output_name.snakecase, :fields => output_fields}
       end
@@ -209,7 +213,7 @@ module Shampoohat
       # Gets subfields defined as elements under given root.
       def get_element_fields(element)
         fields = []
-        REXML::XPath.each(element, 'descendant::element') do |item|
+        REXML::XPath.each(element, "descendant::#{@ns_prefix}element") do |item|
           name = get_element_name(item)
           original_name = get_original_name_if_needed(name)
           field = {
