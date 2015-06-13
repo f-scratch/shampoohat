@@ -19,6 +19,7 @@
 #
 # Generates the wrappers for API services. Only used during the
 # 'rake generate' step of library setup.
+require 'pry'
 require 'savon'
 
 require 'shampoohat/build/savon_service_generator'
@@ -100,6 +101,7 @@ module Shampoohat
       end
 
       def check_service(wsdl)
+        wsdl.endpoint = @wsdl_url.delete("?wsdl") if wsdl.endpoint.nil? # For Yahoo API
         if wsdl.endpoint.nil? || wsdl.namespace.nil?
           raise Shampoohat::Errors::BuildError,
               'WSDL could not be retrieved or parsed.'
