@@ -30,7 +30,9 @@
 `shampoohat` is a Ruby gem.
 Install it using the gem install command.
 
-    $ gem install shampoohat, github: "f-scratch/shampoohat"
+```Gemfile
+gem 'shampoohat', git: "git@github.com:f-scratch/shampoohat.git"
+```
 
 The following gem libraries are required:
 
