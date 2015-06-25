@@ -18,7 +18,6 @@
 #           limitations under the License.
 #
 # Base class for all generated API services based on Savon backend.
-
 require 'savon'
 
 require 'shampoohat/http'
@@ -75,6 +74,7 @@ module Shampoohat
       client.config.log = true
       client.config.raise_errors = false
       client.config.logger.subject = get_logger()
+      # client.config.soap_version = 1
       return client
     end
 

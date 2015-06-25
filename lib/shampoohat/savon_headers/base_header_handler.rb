@@ -18,7 +18,6 @@
 #           limitations under the License.
 #
 # Base class for handlers of SOAP headers.
-
 require 'savon'
 
 module Shampoohat

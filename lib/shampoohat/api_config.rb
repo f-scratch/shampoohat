@@ -20,7 +20,6 @@
 #
 # Helper methods for loading and managing services for an API. Defines methods
 # to be included as class modules in a service class for a specific API.
-
 require 'shampoohat/version.rb'
 
 module Shampoohat
@@ -127,8 +126,8 @@ module Shampoohat
       if !subdir_config().nil?
         base = base.to_s + subdir_config()[[version, service]].to_s
       end
-      _version_ = version.to_s.gsub("_", ".") if version.to_s.include?("_")
-      return base.to_s + _version_.to_s + '/' + service.to_s
+      _version_ = version.to_s.include?("_") ? version.to_s.gsub("_", ".") : version
+      return base.to_s + _version_.to_s + '/advertiserservice.asmx' #+ '/' + service.to_s
     end
 
     # Get the subdirectory for a service, for a given API version.

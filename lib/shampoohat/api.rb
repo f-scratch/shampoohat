@@ -208,7 +208,7 @@ module Shampoohat
               @config,
               api_config.environment_config(environment, :oauth_scope)
           )
-        when :YAHOO, :CRITEO, :NOTHING
+        when :YAHOO, :CRITEO, :CRITEO_LOGIN, :NOTHING
         else
           raise Shampoohat::Errors::Error,
               "Unknown authentication method '%s'" % auth_method
