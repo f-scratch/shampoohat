@@ -76,7 +76,10 @@ module Shampoohat
 
       # Try to re-use the service for this version if it was requested before.
       wrapper = if @wrappers.include?(version) && @wrappers[version][name]
-        @wrappers[version][name]
+        # @wrappers[version][name]
+        # NOTE : don't re-use the service because criteo api change auth_method dinamically
+        @wrappers[version] ||= {}
+        @wrappers[version][name] = prepare_wrapper(version, name)
       else
         @wrappers[version] ||= {}
         @wrappers[version][name] = prepare_wrapper(version, name)
