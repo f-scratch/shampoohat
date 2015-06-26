@@ -127,7 +127,9 @@ module Shampoohat
         base = base.to_s + subdir_config()[[version, service]].to_s
       end
       _version_ = version.to_s.include?("_") ? version.to_s.gsub("_", ".") : version
-      return base.to_s + _version_.to_s + '/advertiserservice.asmx' #+ '/' + service.to_s
+      _endpoint_ = base.to_s + _version_.to_s + '/' + service.to_s
+      _endpoint_ = _endpoint_ + ".asmx" if api_name == 'CriteoApi'
+      _endpoint_
     end
 
     # Get the subdirectory for a service, for a given API version.
