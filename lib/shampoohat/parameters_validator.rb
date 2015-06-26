@@ -72,7 +72,7 @@ module Shampoohat
 
           item_type = get_full_type_signature(field[:type])
           item_ns = field[:ns] || type_ns
-          key = handle_namespace_override_for_fixed(args_hash, key) if @default_namespace
+          key = handle_namespace_override_for_fixed(args_hash, key, original_name) if @default_namespace
           key = handle_namespace_override(args_hash, key, item_ns) if item_ns
 
           # Separate validation for choice types as we need to inject nodes into
@@ -169,8 +169,12 @@ module Shampoohat
       return new_key
     end
 
-    def handle_namespace_override_for_fixed(args, key)
-      new_key = prefix_key(key.to_s.lower_camelcase, @default_namespace)
+    def handle_namespace_override_for_fixed(args, key, original_name=nil)
+      if original_name
+        new_key = prefix_key(key.to_s, @default_namespace)
+      else
+        new_key = prefix_key(key.to_s.lower_camelcase, @default_namespace)
+      end
       rename_hash_key(args, key, new_key)
       replace_array_item(args[:order!], key, new_key)
       return new_key
