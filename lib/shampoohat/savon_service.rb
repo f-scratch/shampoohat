@@ -68,10 +68,9 @@ module Shampoohat
         wsdl.namespace = namespace
         Shampoohat::Http.configure_httpi(@config, httpi)
       end
-      # TODO
       client.config.env_namespace = :soapenv
       client.config.pretty_print_xml = true
-      client.config.log = true
+      # client.config.log = true
       client.config.raise_errors = false
       client.config.logger.subject = get_logger()
       # client.config.soap_version = 1
@@ -85,7 +84,7 @@ module Shampoohat
       args = validator.validate_args(action_name, args)
       response = execute_soap_request(
           action_name.to_sym, args, validator.extra_namespaces)
-      puts response.to_xml
+      # puts response.to_xml
       log_headers(response.http.headers)
       handle_errors(response)
       extractor = ResultsExtractor.new(registry)
@@ -109,7 +108,7 @@ module Shampoohat
         soap.body = args
         header_handler.prepare_request(http, soap)
         soap.namespaces.merge!(extra_namespaces) unless extra_namespaces.nil?
-        puts soap.to_xml
+        # puts soap.to_xml
       end
       return response
     end
