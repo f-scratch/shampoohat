@@ -45,10 +45,13 @@ module Shampoohat
     # - convert some native types to XML.
     def validate_args(action_name, args)
       in_params = @registry.get_method_signature(action_name)[:input]
-      # TODO: compare number of parameters.
-      args_hash = in_params.each_with_index.inject({}) do
-          |result, (in_param, index)|
-        result.merge({in_param[:name] => deep_copy(args[index])})
+      # NOTE: when number of parameters is different(e.g. get_report_fields in Yahoo! API), args_hash must be generated in different way.
+      args_hash = in_params.each_with_index.inject({}) do |result, (in_param, index)|
+        if in_params.size == args.size
+          result.merge({in_param[:name] => deep_copy(args[index])})
+        else
+          result.merge({in_param[:name] => args[0][in_param[:name]]})
+        end
       end
       validate_arguments(args_hash, in_params)
       return args_hash
