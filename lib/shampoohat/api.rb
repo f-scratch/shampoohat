@@ -18,7 +18,6 @@
 #           limitations under the License.
 #
 # Generic API class, to be inherited from and extended by specific APIs.
-
 require 'logger'
 
 require 'shampoohat/config'
@@ -231,7 +230,14 @@ module Shampoohat
     def prepare_wrapper(version, service)
       environment = config.read('service.environment')
       api_config.do_require(version, service)
-      endpoint = api_config.endpoint(environment, version, service)
+      if location_url.nil?
+        endpoint = api_config.endpoint(environment, version, service)
+      else
+        # NOTE : In Yahoo! API, base wsdl url changes depends on its service
+        if self.class == YahooAdApi::Api
+          endpoint = endpoint_for_yahoo(environment, version, service)
+        end
+      end
       interface_class_name = api_config.interface_name(version, service)
 
       wrapper = class_for_path(interface_class_name).new(@config, endpoint)
@@ -295,5 +301,21 @@ module Shampoohat
         scope.const_get(const_name)
       end
     end
+
+    # it should be overridden
+    def location_url
+      nil
+    end
+
+    def endpoint_for_yahoo(environment, version, service)
+      if service == :LocationService
+        _base = api_config.environment_config(environment, :oauth_scope)
+        endpoint = api_config.custom_endpoint(_base, version, service)
+      else
+        endpoint = api_config.custom_endpoint(location_url, version, service)
+      end
+      endpoint
+    end
+
   end
 end

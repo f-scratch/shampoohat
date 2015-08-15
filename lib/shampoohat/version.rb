@@ -21,6 +21,6 @@
 
 module Shampoohat
   module ApiConfig
-    CLIENT_LIB_VERSION = '0.0.2'
+    CLIENT_LIB_VERSION = '0.0.3'
   end
 end

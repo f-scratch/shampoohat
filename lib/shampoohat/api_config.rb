@@ -121,12 +121,7 @@ module Shampoohat
     # The endpoint URL
     #
     def endpoint(environment, version, service)
-      # NOTE : In Yahoo! API, base wsdl url changes depends on its service
-      if api_name == 'YahooAdApi' && service == :LocationService
-        base = environment_config(environment, :oauth_scope) + "/"
-      else
-        base = get_wsdl_base(environment, version)
-      end
+      base = get_wsdl_base(environment, version)
       # TODO(dklimkin): Unflatten subdir constants. Cross-API refactor 0.9.0.
       if !subdir_config().nil?
         base = base.to_s + subdir_config()[[version, service]].to_s
@@ -134,6 +129,15 @@ module Shampoohat
       _version_ = version.to_s.include?("_") ? version.to_s.gsub("_", ".") : version
       _endpoint_ = base.to_s + _version_.to_s + '/' + service.to_s
       _endpoint_ = _endpoint_ + ".asmx" if api_name == 'CriteoApi'
+      _endpoint_
+    end
+
+    def custom_endpoint(base, version, service)
+      if !subdir_config().nil?
+        base = base.to_s + subdir_config()[[version, service]].to_s
+      end
+      _version_ = version.to_s.include?("_") ? version.to_s.gsub("_", ".") : version
+      _endpoint_ = base.to_s + _version_.to_s + '/' + service.to_s
       _endpoint_
     end
 
@@ -244,8 +248,7 @@ module Shampoohat
     #   String containing base URL
     #
     def get_wsdl_base(environment, version)
-      return ENV['ADSAPI_BASE_URL'] ||
-          environment_config(environment, version)
+      return ENV['ADSAPI_BASE_URL'] || environment_config(environment, version)
     end
   end
 end
