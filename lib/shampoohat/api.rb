@@ -234,7 +234,7 @@ module Shampoohat
         endpoint = api_config.endpoint(environment, version, service)
       else
         # NOTE : In Yahoo! API, base wsdl url changes depends on its service
-        if self.class == YahooAdApi::Api
+        if self.class == YahooAdApi::Api || self.class == YdnApi::Api
           endpoint = endpoint_for_yahoo(environment, version, service)
         end
       end
