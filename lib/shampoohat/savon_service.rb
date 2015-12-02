@@ -18,7 +18,7 @@
 #           limitations under the License.
 #
 # Base class for all generated API services based on Savon backend.
-require 'savon'
+require 'ads_savon'
 
 require 'shampoohat/http'
 require 'shampoohat/parameters_validator'
@@ -41,6 +41,7 @@ module Shampoohat
       @config, @version, @namespace = config, version, namespace
       @default_ns = ns
       @client = create_savon_client(endpoint, namespace)
+      @xml_only = false
     end
 
     private
@@ -62,8 +63,7 @@ module Shampoohat
 
     # Creates and sets up Savon client.
     def create_savon_client(endpoint, namespace)
-      Nori.advanced_typecasting = false
-      client = Savon::Client.new do |wsdl, httpi|
+      client = GoogleAdsSavon::Client.new do |wsdl, httpi|
         wsdl.endpoint = endpoint
         wsdl.namespace = namespace
         Shampoohat::Http.configure_httpi(@config, httpi)
@@ -77,13 +77,22 @@ module Shampoohat
       return client
     end
 
+    # Generates and returns SOAP XML for the specified action and args.
+    def get_soap_xml(action_name, args)
+      registry = get_service_registry()
+      validator = ParametersValidator.new(registry)
+      args = validator.validate_args(action_name, args)
+      return handle_soap_request(
+          action_name.to_sym, true, args, validator.extra_namespaces)
+    end
+
     # Executes SOAP action specified as a string with given arguments.
     def execute_action(action_name, args, &block)
       registry = get_service_registry()
       validator = ParametersValidator.new(registry, default_ns)
       args = validator.validate_args(action_name, args)
-      response = execute_soap_request(
-          action_name.to_sym, args, validator.extra_namespaces)
+      response = handle_soap_request(
+          action_name.to_sym, false, args, validator.extra_namespaces)
       # puts response.to_xml
       log_headers(response.http.headers)
       handle_errors(response)
@@ -100,7 +109,7 @@ module Shampoohat
     end
 
     # Executes the SOAP request with original SOAP name.
-    def execute_soap_request(action, args, extra_namespaces)
+    def handle_soap_request(action, xml_only, args, extra_namespaces)
       original_action_name =
           get_service_registry.get_method_signature(action)[:original_name]
       original_action_name = action if original_action_name.nil?
@@ -108,6 +117,7 @@ module Shampoohat
         soap.body = args
         header_handler.prepare_request(http, soap)
         soap.namespaces.merge!(extra_namespaces) unless extra_namespaces.nil?
+        return soap.to_xml if xml_only
         # puts soap.to_xml
       end
       return response

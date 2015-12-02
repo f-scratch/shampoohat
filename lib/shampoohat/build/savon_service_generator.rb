@@ -19,7 +19,7 @@
 #
 # Code template for wrappers generation for Savon backend
 
-require 'savon'
+require 'ads_savon'
 require 'shampoohat/build/savon_abstract_generator'
 
 module Shampoohat
@@ -51,6 +51,10 @@ module Shampoohat
 
           def <%= action %>(*args, &block)
             return execute_action('<%= action %>', args, &block)
+          end
+
+          def <%= action %>_to_xml(*args)
+            return get_soap_xml('<%= action %>', args)
           end
           <% end %>
 

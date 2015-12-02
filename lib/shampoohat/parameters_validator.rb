@@ -17,7 +17,7 @@
 #           See the License for the specific language governing permissions and
 #           limitations under the License.
 #
-# This class validates input parameters before passing them to Savon.
+# This class validates input parameters before passing them to GoogleAdsSavon.
 require 'shampoohat/utils'
 
 module Shampoohat

@@ -19,7 +19,7 @@
 #
 # Code template generator base class
 
-require 'savon'
+require 'ads_savon'
 require 'erb'
 
 module Shampoohat

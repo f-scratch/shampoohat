@@ -48,7 +48,11 @@ module Shampoohat
       #
       def initialize(config, scope)
         super(config)
-        @scope, @client = scope, nil
+        @scopes = []
+        @scopes << scope unless scope.nil?
+        additional_scopes = @config.read('authentication.oauth2_extra_scopes')
+        @scopes += additional_scopes if additional_scopes.is_a?(Array)
+        @client = nil
       end
 
       # Invalidates the stored token if the required credential has changed.
@@ -114,7 +118,7 @@ module Shampoohat
       # - Shampoohat::Errors::AuthError if validation fails
       #
       def validate_credentials(credentials)
-        if @scope.nil?
+        if @scopes.empty?
           raise Shampoohat::Errors::AuthError, 'Scope is not specified.'
         end
 
@@ -165,7 +169,7 @@ module Shampoohat
         oauth_options = OAUTH2_CONFIG.merge({
             :client_id => credentials[:oauth2_client_id],
             :client_secret => credentials[:oauth2_client_secret],
-            :scope => @scope,
+            :scope => @scopes.join(' '),
             :redirect_uri => credentials[:oauth2_callback] || DEFAULT_CALLBACK,
             :state => credentials[:oauth2_state]
         }).reject {|k, v| v.nil?}

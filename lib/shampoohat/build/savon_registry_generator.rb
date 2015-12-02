@@ -19,7 +19,7 @@
 #
 # Code template for registry generation for Savon backend
 
-require 'savon'
+require 'ads_savon'
 require 'shampoohat/build/savon_abstract_generator'
 require 'pp'
 

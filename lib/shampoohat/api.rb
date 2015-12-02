@@ -24,7 +24,7 @@ require 'shampoohat/config'
 require 'shampoohat/errors'
 require 'shampoohat/utils'
 require 'shampoohat/auth/oauth2_handler'
-require 'shampoohat/auth/oauth2_jwt_handler'
+require 'shampoohat/auth/oauth2_service_account_handler'
 
 module Shampoohat
   class Api
@@ -203,10 +203,10 @@ module Shampoohat
               @config,
               api_config.environment_config(environment, :oauth_scope)
           )
-        when :OAUTH2_JWT
+        when :OAUTH2_SERVICE_ACCOUNT
           environment = @config.read('service.environment',
               api_config.default_environment())
-          Shampoohat::Auth::OAuth2JwtHandler.new(
+          Shampoohat::Auth::OAuth2ServiceAccountHandler.new(
               @config,
               api_config.environment_config(environment, :oauth_scope)
           )

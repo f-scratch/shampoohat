@@ -62,6 +62,7 @@ To build the gem:
 
 To run unit tests on the library:
 
+    $ bundle install
     $ rake test
 
 ## Authors

@@ -1,7 +1,5 @@
 # Encoding: utf-8
 #
-# Authors:: api.dklimkin@gmail.com (Danial Klimkin)
-#
 # Copyright:: Copyright 2012, Google Inc. All Rights Reserved.
 #
 # License:: Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +15,7 @@
 #           See the License for the specific language governing permissions and
 #           limitations under the License.
 #
-# This module manages OAuth2.0 JWT authentication.
+# This module manages OAuth2.0 service account authentication.
 
 require 'faraday'
 require 'signet/oauth_2/client'
@@ -29,7 +27,7 @@ module Shampoohat
   module Auth
 
     # Credentials class to handle OAuth2.0 authentication.
-    class OAuth2JwtHandler < Shampoohat::Auth::BaseHandler
+    class OAuth2ServiceAccountHandler < Shampoohat::Auth::BaseHandler
 
       OAUTH2_CONFIG = {
         :token_credential_uri => 'https://accounts.google.com/o/oauth2/token',
@@ -44,7 +42,11 @@ module Shampoohat
       #
       def initialize(config, scope)
         super(config)
-        @scope, @client = scope, nil
+        @scopes = []
+        @scopes << scope unless scope.nil?
+        additional_scopes = @config.read('authentication.oauth2_extra_scopes')
+        @scopes += additional_scopes if additional_scopes.is_a?(Array)
+        @client = nil
       end
 
       # Invalidates the stored token if the required credential has changed.
@@ -60,7 +62,8 @@ module Shampoohat
         raise error
       end
 
-      # Generates auth string for OAuth2.0 JWT method of authentication.
+      # Generates auth string for OAuth2.0 service account method of
+      # authentication.
       #
       # Args:
       # - credentials: credentials set for authorization
@@ -83,7 +86,7 @@ module Shampoohat
 
       # Refreshes access token from refresh token.
       def refresh_token!()
-        return nil if @token.nil? or @token[:refresh_token].nil?
+        return nil if @token.nil?
         @client.refresh!
         @token = token_from_client(@client)
         return @token
@@ -91,7 +94,8 @@ module Shampoohat
 
       private
 
-      # Auxiliary method to validate the credentials for JWT authentication.
+      # Auxiliary method to validate the credentials for service account
+      # authentication.
       #
       # Args:
       # - credentials: a hash with the credentials for the account being
@@ -101,7 +105,7 @@ module Shampoohat
       # - Shampoohat::Errors::AuthError if validation fails
       #
       def validate_credentials(credentials)
-        if @scope.nil?
+        if @scopes.empty?
           raise Shampoohat::Errors::AuthError, 'Scope is not specified.'
         end
 
@@ -121,18 +125,18 @@ module Shampoohat
 
         if credentials[:oauth2_key].nil? && credentials[:oauth2_keyfile].nil?
           raise Shampoohat::Errors::AuthError,
-              'Either key or key file must be provided for OAuth2 JWT.'
+              'Either key or key file must be provided for OAuth2 service account.'
         end
 
         if credentials[:oauth2_key] && credentials[:oauth2_keyfile]
           raise Shampoohat::Errors::AuthError,
-              'Both JWT key and key file provided, only one can be used.'
+              'Both service account key and key file provided, only one can be used.'
         end
 
         if credentials[:oauth2_key] &&
             !credentials[:oauth2_key].kind_of?(OpenSSL::PKey::RSA)
           raise Shampoohat::Errors::AuthError,
-              'OAuth2 JWT key provided must be of type OpenSSL::PKey::RSA.'
+              'OAuth2 service account key provided must be of type OpenSSL::PKey::RSA.'
         end
 
         if credentials[:oauth2_keyfile] &&
@@ -167,18 +171,18 @@ module Shampoohat
 
       # Creates a Signet client based on credentials.
       def create_client(credentials)
-        credentials = load_oauth2_jwt_credentials(credentials)
+        credentials = load_oauth2_service_account_credentials(credentials)
         oauth_options = OAUTH2_CONFIG.merge({
             :issuer => credentials[:oauth2_issuer],
             :signing_key => credentials[:oauth2_key],
             :person => credentials[:oauth2_prn],
-            :scope => @scope,
+            :scope => @scopes.join(' '),
         })
         return Signet::OAuth2::Client.new(oauth_options)
       end
 
-      # Loads JWT key if configured with a filename.
-      def load_oauth2_jwt_credentials(credentials)
+      # Loads service account key if configured with a filename.
+      def load_oauth2_service_account_credentials(credentials)
         return credentials unless credentials.include?(:oauth2_keyfile)
         key_file = File.read(credentials[:oauth2_keyfile])
         key_secret = credentials[:oauth2_secret]

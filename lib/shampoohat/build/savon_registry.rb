@@ -20,7 +20,7 @@
 # Registry object for Savon backend. Used on generation step as parsed
 # representation of WSDL for API stubs generation.
 
-require 'savon'
+require 'ads_savon'
 require 'rexml/document'
 
 require 'shampoohat/utils'

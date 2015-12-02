@@ -280,7 +280,7 @@ module Shampoohat
       return result
     end
 
-    # Handles attributes received from Savon.
+    # Handles attributes received from GoogleAdsSavon.
     def process_attributes(data, keep_xsi_type = false)
       if keep_xsi_type
         xsi_type = data.delete(:"@xsi:type")
