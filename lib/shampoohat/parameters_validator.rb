@@ -24,6 +24,7 @@ module Shampoohat
   class ParametersValidator
     # Savon special keys.
     IGNORED_HASH_KEYS = [:order!, :attributes!]
+    FLATTEN_KEYS = %i[report_category].freeze
 
     # We collect required namespaces into this hash during validation.
     attr_reader :extra_namespaces
@@ -45,12 +46,14 @@ module Shampoohat
     # - convert some native types to XML.
     def validate_args(action_name, args)
       in_params = @registry.get_method_signature(action_name)[:input]
-      # NOTE: when number of parameters is different(e.g. get_report_fields in Yahoo! API), args_hash must be generated in different way.
       args_hash = in_params.each_with_index.inject({}) do |result, (in_param, index)|
-        if in_params.size == args.size
-          result.merge({in_param[:name] => deep_copy(args[index])})
-        else
+        # NOTE : Yahoo APIの場合、次のケースでは、入れ子構造にしない
+        # - パラメータの数が異なる場合
+        # - パラメータの数は同じでも、予め指定したnameをもつ場合
+        if in_params.size != args.size || FLATTEN_KEYS.include?(in_param[:name])
           result.merge({in_param[:name] => args[0][in_param[:name]]})
+        else
+          result.merge({in_param[:name] => deep_copy(args[index])})
         end
       end
       validate_arguments(args_hash, in_params)
