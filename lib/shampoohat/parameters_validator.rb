@@ -24,7 +24,7 @@ module Shampoohat
   class ParametersValidator
     # Savon special keys.
     IGNORED_HASH_KEYS = [:order!, :attributes!]
-    FLATTEN_KEYS = %i[report_category].freeze
+    FLATTEN_KEYS = %i[report_category report_type].freeze
 
     # We collect required namespaces into this hash during validation.
     attr_reader :extra_namespaces
